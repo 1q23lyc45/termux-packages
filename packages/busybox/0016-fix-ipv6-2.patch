@@ -1,5 +1,5 @@
---- networking/interface.c.orig	2024-11-30 18:15:36.609159072 +0800
-+++ networking/interface.c	2024-11-30 18:18:04.293159016 +0800
+--- ./networking/interface.c.orig	2024-11-30 18:15:36.609159072 +0800
++++ ./networking/interface.c	2024-11-30 18:18:04.293159016 +0800
 @@ -53,18 +53,19 @@
  #define _PATH_PROCNET_DEV               "/proc/net/dev"
  #define _PATH_PROCNET_IFINET6           "/proc/net/if_inet6"
