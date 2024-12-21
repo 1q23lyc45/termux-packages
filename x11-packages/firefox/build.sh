@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="126.0"
-TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=910e82a1999ec229e5bc5090a39cec9c575e8bafcac2c54f9bb5c699bd868526
+TERMUX_PKG_VERSION="133.0.3"
+TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
+TERMUX_PKG_SHA256=f134a5420200bb03ab460f9d2867507c0edb222ce73faf4064cdbea02a0aca1b
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
-TERMUX_PKG_BUILD_DEPENDS="binutils-cross, libcpufeatures, libice, libsm"
+TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -24,8 +24,8 @@ termux_pkg_auto_update() {
 	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=2
 	local uptime_s_limit=$((uptime_h_limit*60*60))
-	[[ -z "${uptime_s}" ]] && e=1
-	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
 	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
 
 	if [[ "${e}" != 0 ]]; then
@@ -50,6 +50,22 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	# XXX: flang toolchain provides libclang.so
+	termux_setup_flang
+	local __fc_dir="$(dirname $(command -v $FC))"
+	local __flang_toolchain_folder="$(realpath "$__fc_dir"/..)"
+	if [ ! -d "$TERMUX_PKG_TMPDIR/firefox-toolchain" ]; then
+		rm -rf "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
+		mv "$__flang_toolchain_folder" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
+
+		cp "$(command -v "$CC")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+		cp "$(command -v "$CXX")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+		cp "$(command -v "$CPP")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+
+		mv "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp "$TERMUX_PKG_TMPDIR"/firefox-toolchain
+	fi
+	export PATH="$TERMUX_PKG_TMPDIR/firefox-toolchain/bin:$PATH"
+
 	termux_setup_nodejs
 	termux_setup_rust
 
@@ -58,9 +74,8 @@ termux_step_pre_configure() {
 	# Out of memory when building gkrust
 	# CI shows (signal: 9, SIGKILL: kill)
 	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
-		case "${TERMUX_ARCH}" in
-		aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
-		esac
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
 	fi
 
 	cargo install cbindgen
@@ -68,18 +83,27 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/firefox-toolchain/sysroot"
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
+	env_name=${env_name//-/_}
+	export $env_name="$BINDGEN_CFLAGS"
+
 	# https://reviews.llvm.org/D141184
 	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
 	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
-		termux_setup_no_integrated_as
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
 	fi
 }
 
 termux_step_configure() {
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		termux_step_pre_configure
+		cd $TERMUX_PKG_SRCDIR
+	fi
+
 	sed \
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|" \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
@@ -97,7 +121,7 @@ END
 }
 
 termux_step_make() {
-	./mach build --keep-going
+	./mach build
 	./mach buildsymbols
 }
 

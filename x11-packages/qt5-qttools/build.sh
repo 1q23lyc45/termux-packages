@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc.)"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.15.10
-TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=66f46c9729c831dce431778a9c561cca32daceaede1c7e58568d7a5898167dae
+TERMUX_PKG_VERSION="5.15.16"
+TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=1cab11887faca54af59f4995ee435c9ad98d194e9e6889c846692c8b6815fc1c
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -57,7 +57,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -79,7 +79,7 @@ termux_step_post_make_install() {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 	}
 
@@ -98,7 +98,7 @@ termux_step_post_make_install() {
 	cd "${TERMUX_PKG_SRCDIR}/src/linguist/linguist" && {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 	}
 
@@ -124,7 +124,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -151,7 +151,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			make install
 		}
 	done
@@ -189,7 +189,7 @@ termux_step_post_make_install() {
 		make clean
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		install -Dm700 \
 			"../../bin/qtattributionsscanner" \
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qtattributionsscanner"
@@ -200,7 +200,7 @@ termux_step_post_make_install() {
 			make clean
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
 		}
 	done

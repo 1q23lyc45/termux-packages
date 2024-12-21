@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION="2.9.4"
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=45aea378933b9e468f656051ed2bfcf93bab02bb350f94e8754727eb17b407a4
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="docbook-xsl"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libiconv, libgcrypt, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="docbook-xsl,libdb"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"

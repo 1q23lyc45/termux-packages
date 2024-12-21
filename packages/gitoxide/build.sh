@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.36.0"
+TERMUX_PKG_VERSION="0.39.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=36142c7388c68732a953fcfd9dcd609241b1d9a5d2fdb2e796e987b6b6872fa7
+TERMUX_PKG_SHA256=50d8dcaa16e9a2dbcd89d6a68cae0c136734ca4b64a861a48ff6784e9939d4ca
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -28,13 +29,14 @@ termux_step_pre_configure() {
 	done
 
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then
-		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 	fi
 }
 
 termux_step_make() {
 	cargo build \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME \
 		--release \
 		--no-default-features \

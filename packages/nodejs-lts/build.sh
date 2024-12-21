@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=20.13.1
+TERMUX_PKG_VERSION=22.12.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=791786a09023241cb7e4f7d65ec90aa924bb39141ff7bb6d5a1dedf7def4b4e7
+TERMUX_PKG_SHA256=fe1bc4be004dc12721ea2cb671b08a21de01c6976960ef8a1248798589679e16
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -27,13 +27,13 @@ termux_step_pre_configure() {
 }
 
 termux_step_host_build() {
-	local ICU_VERSION=75.1
+	local ICU_VERSION=76.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
 	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
-		cb968df3e4d2e87e8b11c49a5d01c787bd13b9545280fc6642f826527618caef
+		dfacb46bfe4747410472ce3e1144bf28a102feeaa4e3875bac9b4c6cf30f4f3e
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
@@ -46,7 +46,7 @@ termux_step_host_build() {
 			--disable-samples \
 			--disable-tests
 	fi
-	make -j $TERMUX_MAKE_PROCESSES install
+	make -j $TERMUX_PKG_MAKE_PROCESSES install
 }
 
 termux_step_configure() {
@@ -98,9 +98,9 @@ termux_step_configure() {
 
 termux_step_make() {
 	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
-		ninja -C out/Debug -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Debug -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	else
-		ninja -C out/Release -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Release -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	fi
 }
 

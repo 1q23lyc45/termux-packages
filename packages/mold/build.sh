@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rui314/mold
 TERMUX_PKG_DESCRIPTION="mold: A Modern Linker"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.31.0"
+TERMUX_PKG_VERSION="2.35.1"
 TERMUX_PKG_SRCURL=https://github.com/rui314/mold/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3dc3af83a5d22a4b29971bfad17261851d426961c665480e2ca294e5c74aa1e5
-TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, openssl, zlib"
+TERMUX_PKG_SHA256=912b90afe7fde03e53db08d85a62c7b03a57417e54afc72c08e2fa07cab421ff
+TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, openssl, zlib, zstd"
 TERMUX_PKG_AUTO_UPDATE=true
 
 # dont depend on system libtbb, xxhash
