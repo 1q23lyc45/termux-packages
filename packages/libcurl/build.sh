@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.11.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_PKG_VERSION//./_}/curl-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c7ca7db48b0909743eaef34250da02c19bc61d4f1dcedd6603f109409536ab56
 TERMUX_PKG_AUTO_UPDATE=true
@@ -29,6 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-openssl-quic
 --with-nghttp3
 --enable-ares
+--enable-ech
 "
 
 # https://github.com/termux/termux-packages/issues/15889
