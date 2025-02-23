@@ -29,7 +29,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-openssl-quic
 --with-nghttp3
 --enable-ares
---enable-ech
 "
 
 # https://github.com/termux/termux-packages/issues/15889
