@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://ollama.com/
 TERMUX_PKG_DESCRIPTION="Get up and running with large language models"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.6.3"
+TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_SRCURL=git+https://github.com/ollama/ollama
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
