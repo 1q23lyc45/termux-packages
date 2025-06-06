@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="flang/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 LLVM_MAJOR_VERSION=20
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.2
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.6
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
-TERMUX_PKG_SHA256=f0a4a240aabc9b056142d14d5478bb6d962aeac549cbd75b809f5499240a8b38
+TERMUX_PKG_SHA256=5c70549d524284c184fe9fbff862c3d2d7a61b787570611b5a30e5cc345f145e
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 # `flang-new` should be rebuilt when libllvm bumps version.
@@ -16,7 +16,7 @@ TERMUX_PKG_DEPENDS="libandroid-complex-math-static, libc++, libllvm (= $DEP_QUAL
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 
 # Upstream doesn't support 32-bit arches well. See https://github.com/llvm/llvm-project/issues/57621.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

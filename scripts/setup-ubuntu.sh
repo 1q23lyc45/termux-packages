@@ -220,13 +220,11 @@ PACKAGES+=" happy"
 PACKAGES+=" itstool"
 PACKAGES+=" libdbus-glib-1-dev-bin"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
-PACKAGES+=" libwayland-dev"
 PACKAGES+=" python3-html5lib"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" unifdef"
-PACKAGES+=" wayland-scanner++"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
@@ -297,6 +295,14 @@ PACKAGES+=" libwebpmux3 libwebpmux3:i386"
 # Required by chromium-based packages
 PACKAGES+=" libfontconfig1"
 PACKAGES+=" libfontconfig1:i386"
+PACKAGES+=" libcups2-dev"
+PACKAGES+=" libglib2.0-0t64:i386"
+PACKAGES+=" libexpat1:i386"
+
+# Required by code-oss
+PACKAGES+=" libxkbfile-dev"
+PACKAGES+=" libsecret-1-dev"
+PACKAGES+=" libkrb5-dev"
 
 # Required by wine-stable
 PACKAGES+=" libfreetype-dev:i386"
@@ -357,6 +363,7 @@ $SUDO ln -sf /data/data/com.termux/files/usr/opt/aosp /system
 # Install newer pkg-config then what ubuntu provides, as the stock
 # ubuntu version has performance problems with at least protobuf:
 PKGCONF_VERSION=2.3.0
+PKGCONF_SHA256=3a9080ac51d03615e7c1910a0a2a8df08424892b5f13b0628a204d3fcce0ea8b
 HOST_TRIPLET=$(gcc -dumpmachine)
 PKG_CONFIG_DIRS=$(grep DefaultSearchPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
 SYSTEM_LIBDIRS=$(grep SystemLibraryPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
@@ -364,6 +371,7 @@ mkdir -p /tmp/pkgconf-build
 cd /tmp/pkgconf-build
 curl -O https://distfiles.ariadne.space/pkgconf/pkgconf-${PKGCONF_VERSION}.tar.xz
 tar xf pkgconf-${PKGCONF_VERSION}.tar.xz
+echo "${PKGCONF_SHA256}  pkgconf-${PKGCONF_VERSION}.tar.xz" | sha256sum -c -
 cd pkgconf-${PKGCONF_VERSION}
 echo "SYSTEM_LIBDIRS: $SYSTEM_LIBDIRS"
 echo "PKG_CONFIG_DIRS: $PKG_CONFIG_DIRS"

@@ -61,7 +61,7 @@ fi
 		# only delete `TERMUX__PREFIX` since its parent directories could
 		# be a critical directory in `TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS`.
 		# This should not be an issue as package files are only packed
-		# from `TERMUX_PREFIX_CLASSICAL` via `termux_step_extract_into_massagedir()`.
+		# from `TERMUX_PREFIX_CLASSICAL` via `termux_step_copy_into_massagedir()`.
 		if [[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR" ]] || \
 			[[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR/"* ]]; then
 			deletion_dir="$TERMUX_APP__DATA_DIR"
@@ -88,6 +88,9 @@ fi
 			cgct_dir_escaped="$(printf "%s" "$CGCT_DIR" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
 			find "$deletion_dir" -mindepth 1 -regextype posix-extended ! -regex "^$cgct_dir_escaped(/.*)?" -delete 2>/dev/null || true
 		fi
+
+		# Remove list of built packages.
+		rm -Rf "/data/data/.built-packages"
 	fi
 
 	rm -Rf "$TERMUX_TOPDIR"
