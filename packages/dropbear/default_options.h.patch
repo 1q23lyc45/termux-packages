@@ -99,3 +99,12 @@
 +#define DEFAULT_ROOT_PATH DEFAULT_PATH
  
  #endif /* DROPBEAR_DEFAULT_OPTIONS_H_ */
+@@ -268,7 +268,7 @@
+ 
+ /* Per client configuration file
+ */
+-#define DROPBEAR_USE_SSH_CONFIG 0
++#define DROPBEAR_USE_SSH_CONFIG 1
+ 
+ /* Allow specifying the password for dbclient via the DROPBEAR_PASSWORD
+  * environment variable. */
