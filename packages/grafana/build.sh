@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observabilit
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:11.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -28,7 +29,7 @@ termux_step_pre_configure() {
 
 	export PATH="$bin:$PATH"
 
-	export NODE_OPTIONS=--max-old-space-size=6000
+	NODE_OPTIONS+=" --max-old-space-size=6000"
 	NODE_OPTIONS+=" --openssl-legacy-provider"
 }
 

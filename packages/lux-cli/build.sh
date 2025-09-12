@@ -2,14 +2,46 @@ TERMUX_PKG_HOMEPAGE=https://nvim-neorocks.github.io/
 TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.10.1"
+TERMUX_PKG_VERSION="0.17.0"
 TERMUX_PKG_SRCURL="https://github.com/nvim-neorocks/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=aa340331295a6844266e799e1cd58eed1caa5b25c6efc52233e2650cb2d33e59
-TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, luajit, openssl, xz-utils"
+TERMUX_PKG_SHA256=e40842622877f8902807233e3589d5c2bb5760c58a145253ca22efeff07f9f17
+TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
 TERMUX_PKG_PROVIDES="lx"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+
+termux_pkg_auto_update() {
+	# based on `termux_github_api_get_tag.sh`
+	# fetch newest tags
+	local newest_tags newest_tag
+	newest_tags="$(curl -d "$(cat <<-EOF | tr '\n' ' '
+	{
+		"query": "query {
+			repository(owner: \"nvim-neorocks\", name: \"lux\") {
+				refs(refPrefix: \"refs/tags/\", first: 20, orderBy: {
+					field: TAG_COMMIT_DATE, direction: DESC
+				})
+				{ edges { node { name } } }
+			}
+		}"
+	}
+	EOF
+	)" \
+		-H "Authorization: token ${GITHUB_TOKEN}" \
+		-H "Accept: application/vnd.github.v3+json" \
+		--silent \
+		--location \
+		--retry 10 \
+		--retry-delay 1 \
+		https://api.github.com/graphql \
+		| jq '.data.repository.refs.edges[].node.name')"
+	# filter only tags having "v" at the start and extract only raw version.
+	read -r newest_tag < <(echo "$newest_tags" | grep -Po '(?<=^"v)\d+\.\d+\.\d+' | sort -Vr)
+
+	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	termux_pkg_upgrade_version "${newest_tag}"
+}
 
 # Function to obtain the .deb URL
 obtain_deb_url() {
@@ -103,6 +135,14 @@ termux_step_pre_configure() {
 	fi
 
 	termux_setup_rust
+
+	# ld: error: undefined symbol: __atomic_compare_exchange
+	# ld: error: undefined symbol: __atomic_load
+	# ld: error: undefined symbol: __atomic_is_lock_free
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
 
 	cargo fetch --locked --target "$CARGO_TARGET_NAME"
 

@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="140.0.1"
+TERMUX_PKG_VERSION="142.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}/source/thunderbird-${TERMUX_PKG_VERSION}.source.tar.xz"
-TERMUX_PKG_SHA256=a6e5c8bf9c432e9ed3e7c5a8c3ebc999e6b7b00af66aa829f1e98d11bf75568f
+TERMUX_PKG_SHA256=18f625452d2001ef1b5a1b47a77521c73c83e1bae824f783a0965d229c434e37
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -49,23 +50,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	# XXX: flang toolchain provides libclang.so
-	termux_setup_flang
-	local __fc_dir __flang_toolchain_folder
-	__fc_dir="$(dirname "$(command -v "$FC")")"
-	__flang_toolchain_folder="$(realpath "$__fc_dir"/..)"
-	if [ ! -d "$TERMUX_PKG_TMPDIR/thunderbird-toolchain" ]; then
-		rm -rf "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp
-		mv "$__flang_toolchain_folder" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp
-
-		cp "$(command -v "$CC")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-		cp "$(command -v "$CXX")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-		cp "$(command -v "$CPP")" "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp/bin/
-
-		mv "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain-tmp "$TERMUX_PKG_TMPDIR"/thunderbird-toolchain
-	fi
-	export PATH="$TERMUX_PKG_TMPDIR/thunderbird-toolchain/bin:$PATH"
-
 	termux_setup_nodejs
 	termux_setup_rust
 
@@ -81,7 +65,7 @@ termux_step_pre_configure() {
 	HOST_CXX="$(command -v clang++)"
 	export HOST_CC HOST_CXX
 
-	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/thunderbird-toolchain/sysroot"
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot"
 	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
 	export "$env_name"="$BINDGEN_CFLAGS"
@@ -116,7 +100,6 @@ END
 	fi
 
 	./mach configure
-	./mach tb-rust vendor
 }
 
 termux_step_make() {

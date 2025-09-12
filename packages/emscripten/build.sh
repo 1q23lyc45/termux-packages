@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.10"
+TERMUX_PKG_VERSION="4.0.14"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="nodejs-lts | nodejs, python"
@@ -54,13 +54,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=8f7e57485ee73205e108d74abb5565d5c63beaca
-_LLVM_TGZ_SHA256=ea3bdec770d19962bc678ec290d47feab1c88943acd26837a60caf5285768482
+_LLVM_COMMIT=1cc84bcc08f723a6ba9d845c3fed1777547f45f9
+_LLVM_TGZ_SHA256=ef47b1de67e897fc838d9610dc803da5d123edb14ffe5dbb691154f2ba9ac40a
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=8c82b6884483315011541e4519afdcb7fd46df68
-_BINARYEN_TGZ_SHA256=7ab7ffe0dabbefe121ab4234a11d2ab04ff45827df050a0ab8b1cdc66465cbaf
+_BINARYEN_COMMIT=fc1a391b9320602b624cefe5e760eda40cbb05a3
+_BINARYEN_TGZ_SHA256=48e4d73d7a7f3f78c1cb7e25ecaaa892e3b9abbb03a5920198a88c74ecc93c19
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -239,6 +239,14 @@ termux_step_pre_configure() {
 	# this is a workaround for build-all.sh issue
 	TERMUX_PKG_DEPENDS+=", emscripten-binaryen, emscripten-llvm"
 
+	termux_setup_cmake
+	termux_setup_ninja
+
+	# emscripten 4.0.11
+	# for "npm ci --omit=dev" in ./tools/install.py
+	# but we still remove "node_modules" directory in make install step
+	termux_setup_nodejs
+
 	# https://github.com/termux/termux-packages/issues/16358
 	# TODO libclang-cpp.so* is not affected
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
@@ -263,9 +271,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	termux_setup_cmake
-	termux_setup_ninja
+	:
+}
 
+termux_step_make_install() {
 	# from packages/libllvm/build.sh
 	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
@@ -300,10 +309,13 @@ termux_step_make() {
 		-C "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		install
-}
 
-termux_step_make_install() {
 	pushd "${TERMUX_PKG_SRCDIR}"
+
+	# emscripten 4.0.13
+	# https://github.com/emscripten-core/emscripten/pull/23761
+	# https://github.com/termux/termux-packages/issues/25777
+	./tools/maint/create_entry_points.py
 
 	# https://github.com/emscripten-core/emscripten/pull/15840
 	sed -e "s|-git||" -i "${TERMUX_PKG_SRCDIR}/emscripten-version.txt"
@@ -311,6 +323,10 @@ termux_step_make_install() {
 	# skip using Makefile which does host npm install
 	rm -fr "${TERMUX_PREFIX}/opt/emscripten"
 	./tools/install.py "${TERMUX_PREFIX}/opt/emscripten"
+
+	# remove node_modules directory
+	# to be installed on device post install
+	rm -fr "${TERMUX_PREFIX}/opt/emscripten/node_modules"
 
 	# subpackage optional third party test suite files
 	cp -fr "${TERMUX_PKG_SRCDIR}/test/third_party" "${TERMUX_PREFIX}/opt/emscripten/test/third_party"
@@ -359,6 +375,13 @@ termux_step_post_massage() {
 	local df=$(diff -u <(echo "${upstream_bin}") <(echo -e "${llvm_bin}\n${binaryen_bin}" | sort))
 	if [[ -n "${df}" ]]; then
 		termux_error_exit "Mismatch list of binaries with upstream:\n${df}"
+	fi
+
+	local upstream_entrypoint=$(find "${TERMUX_PKG_CACHEDIR}/emsdk/upstream/emscripten" -mindepth 1 -maxdepth 1 -type f | xargs -i bash -c "[[ -x '{}' ]] && basename '{}'" | sort)
+	local downstream_entrypoint=$(find "${TERMUX_PREFIX}/opt/emscripten" -mindepth 1 -maxdepth 1 -type f | xargs -i bash -c "[[ -x '{}' ]] && basename '{}'" | sort)
+	local df2=$(diff -u <(echo "${upstream_entrypoint}") <(echo "${downstream_entrypoint}"))
+	if [[ -n "${df2}" ]]; then
+		termux_error_exit "Mismatch list of entrypoints with upstream:\n${df2}"
 	fi
 }
 

@@ -2,9 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://zrok.io/
 TERMUX_PKG_DESCRIPTION="An open source sharing solution built on OpenZiti."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="1.0.7"
-TERMUX_PKG_SRCURL=https://github.com/openziti/zrok/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=92ac17adc95aa732983b267e0a371eea89daa85517c5867e420188d946fc2072
+TERMUX_PKG_VERSION="1.1.3"
+TERMUX_PKG_REVISION=1
+# do not use /archive/refs/tags/ URL link to avoid retagging
+TERMUX_PKG_SRCURL=https://github.com/openziti/zrok/releases/download/v${TERMUX_PKG_VERSION}/source-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=dd0df7a544bfbc4e358b46e1d14819546a518886ab5b27ea0ce3aa43e76e84cf
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

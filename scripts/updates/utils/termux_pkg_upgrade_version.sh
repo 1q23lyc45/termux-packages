@@ -61,9 +61,15 @@ termux_pkg_upgrade_version() {
 		unset OLD_LATEST_VERSION
 	fi
 
-	# Translate "_" into ".": some packages use underscores to seperate
+	# Translate "_" into ".": some packages use underscores to separate
 	# version numbers, but we require them to be separated by dots.
 	LATEST_VERSION="${LATEST_VERSION//_/.}"
+
+	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
+	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
+	LATEST_VERSION="${LATEST_VERSION//-rc/~rc}"
+	LATEST_VERSION="${LATEST_VERSION//-alpha/~alpha}"
+	LATEST_VERSION="${LATEST_VERSION//-beta/~beta}"
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
@@ -135,9 +141,14 @@ termux_pkg_upgrade_version() {
 	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 		echo "INFO: Committing package."
 		stderr="$(
-			git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
-			git commit -m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
-				-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
+			git add \
+				"${TERMUX_PKG_BUILDER_DIR}" \
+				"${TERMUX_SCRIPTDIR}/scripts/build/setup/" \
+				2>&1 >/dev/null
+			git commit \
+				-m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
+				-m "This commit has been automatically submitted by Github Actions." \
+				2>&1 >/dev/null
 		)" || {
 			git reset HEAD --hard
 			termux_error_exit <<-EndOfError
