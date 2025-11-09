@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="17.0.16"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="17.0.17"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
-TERMUX_PKG_SHA256=bc339edfa44646fa3c80971237ba4681e43a28877912cda2839aa42a15f0c7e7
+TERMUX_PKG_SHA256=e2d1d92a4a593d9a87054ea54f76fcb6119f782c57945506a2ec4adff6ddc123
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto, alsa-lib"
@@ -46,12 +46,20 @@ termux_pkg_auto_update() {
 	# filter only tags having "-ga" and extract only raw version.
 	read -r newest_tag < <(echo "$newest_tags" | grep -Po '17\.\d+\.\d+(?=-ga)' | sort -Vr)
 
-	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${newest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	termux_pkg_upgrade_version "${newest_tag}"
 }
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
+
+	local patch="$TERMUX_PKG_BUILDER_DIR/tmpdir-path-length.diff"
+	local tmpdir_path="$TERMUX_PREFIX/tmp"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		-e "s%\@TERMUX_TMPDIR_PATH_LENGTH\@%${#tmpdir_path}%g" \
+		"$patch" | patch --silent -p1
 }
 
 termux_step_configure() {
@@ -145,7 +153,7 @@ termux_step_post_make_install() {
 		}
 	done
 	if [[ "$failure" = true ]]; then
-		termux_error_exit "ERROR: openjdk-17.alternatives is not up to date, please update it."
+		termux_error_exit "openjdk-17.alternatives is not up to date, please update it."
 	fi
 }
 

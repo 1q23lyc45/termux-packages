@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ggml-org/llama.cpp
 TERMUX_PKG_DESCRIPTION="LLM inference in C/C++"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER=@termux
-TERMUX_PKG_VERSION="0.0.0-b6451"
+TERMUX_PKG_VERSION="0.0.0-b6992"
 TERMUX_PKG_SRCURL=https://github.com/ggml-org/llama.cpp/archive/refs/tags/${TERMUX_PKG_VERSION#*-}.tar.gz
-TERMUX_PKG_SHA256=9b1bb282c520b736c40a1f87637211356586ca68fa61dccdd8d68be1966f751e
+TERMUX_PKG_SHA256=65c4cf114c838d5849d91c7d00507561bccca0dace5d8d6f1dc841c9046a8483
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libcurl"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, opencl-headers, ocl-icd"
@@ -31,7 +31,7 @@ termux_pkg_auto_update() {
 	)"
 
 	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	fi
 	termux_pkg_upgrade_version "0.0.0-${latest_tag}"
 }

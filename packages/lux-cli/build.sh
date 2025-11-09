@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nvim-neorocks.github.io/
 TERMUX_PKG_DESCRIPTION="A package manager for Lua, similar to luarocks"
 TERMUX_PKG_LICENSE="LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.17.0"
+TERMUX_PKG_VERSION="0.20.0"
 TERMUX_PKG_SRCURL="https://github.com/nvim-neorocks/lux/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=e40842622877f8902807233e3589d5c2bb5760c58a145253ca22efeff07f9f17
+TERMUX_PKG_SHA256=f9143d2b72fb277f12634eb3c34c09740787ca645ebd5e318411b33e24795c8e
 TERMUX_PKG_DEPENDS="bzip2, gpgme, libgit2, libgpg-error, lua54, openssl, xz-utils"
 TERMUX_PKG_PROVIDES="lx"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -39,7 +39,7 @@ termux_pkg_auto_update() {
 	# filter only tags having "v" at the start and extract only raw version.
 	read -r newest_tag < <(echo "$newest_tags" | grep -Po '(?<=^"v)\d+\.\d+\.\d+' | sort -Vr)
 
-	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${newest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	termux_pkg_upgrade_version "${newest_tag}"
 }
 

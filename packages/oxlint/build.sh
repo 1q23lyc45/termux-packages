@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://oxc.rs/
 TERMUX_PKG_DESCRIPTION="Oxc JavaScript linter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.15.0"
+TERMUX_PKG_VERSION="1.16.0"
 TERMUX_PKG_SRCURL="https://github.com/oxc-project/oxc/archive/refs/tags/oxlint_v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=9822b1b1a2f3f70250d9a897d5fd63881d3abc54fdfb515999a349e63325665b
+TERMUX_PKG_SHA256=53fda71250a6fd37e7928510f6ec97de894e3dfdb0c959e3320eb9bd445b7654
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -36,7 +36,7 @@ termux_pkg_auto_update() {
 	# filter only tags having "oxlint_v" and extract only raw version.
 	read -r newest_tag < <(echo "$newest_tags" | grep -Po 'oxlint_v\K\d+\.\d+\.\d+' | sort -Vr)
 
-	[[ -z "${newest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${newest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	termux_pkg_upgrade_version "${newest_tag}"
 }
 

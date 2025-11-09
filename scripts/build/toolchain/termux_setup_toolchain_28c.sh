@@ -144,6 +144,7 @@ termux_setup_toolchain_28c() {
 		_NDK_ARCHNAME=x86
 	fi
 	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
+	cp $NDK/source.properties $_TERMUX_TOOLCHAIN_TMPDIR
 
 	# Remove android-support header wrapping not needed on android-21:
 	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
@@ -217,9 +218,6 @@ termux_setup_toolchain_28c() {
 	rm usr/include/unicode/{char16ptr,platform,ptypes,putil,stringoptions,ubidi,ubrk,uchar,uconfig,ucpmap,udisplaycontext,uenum,uldnames,ulocdata,uloc,umachine,unorm2,urename,uscript,ustring,utext,utf16,utf8,utf,utf_old,utypes,uvernum,uversion}.h
 	rm -Rf usr/include/vulkan
 	rm -Rf usr/include/{EGL,GLES{,2,3}}
-
-	sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
-		usr/include/android/api-level.h
 
 	$TERMUX_ELF_CLEANER --api-level=$TERMUX_PKG_API_LEVEL usr/lib/*/*/*.so | { [[ "${CI-}" == "true" ]] && sed -e '1i\::group::Applying `termux-elf-cleaner`' -e '$a\::endgroup::' || cat; }
 	for dir in usr/lib/*; do

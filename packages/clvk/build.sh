@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=3a5774ac6a30153f484fe49c117ab5a7e83aef5f
-_COMMIT_DATE=20250903
-_COMMIT_TIME=181031
-TERMUX_PKG_VERSION="0.0.20250903.181031"
+_COMMIT=92aa04a92e4f54a83968181d4a44e0c9ff527b09
+_COMMIT_DATE=20251027
+_COMMIT_TIME=085800
+TERMUX_PKG_VERSION="0.0.20251027.085800"
 TERMUX_PKG_SRCURL=git+https://github.com/kpet/clvk
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
@@ -39,7 +39,7 @@ termux_pkg_auto_update() {
 
 	local latest_commit_date_tz=$(curl -s "${api_url}/${latest_commit}" | jq .commit.committer.date | sed -e 's|\"||g')
 	if [[ -z "${latest_commit_date_tz}" ]]; then
-		termux_error_exit "ERROR: Unable to get latest commit date info"
+		termux_error_exit "Unable to get latest commit date info"
 	fi
 
 	local latest_commit_date=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')

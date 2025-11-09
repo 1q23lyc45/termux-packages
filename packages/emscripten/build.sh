@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.14"
+TERMUX_PKG_VERSION="4.0.19"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="nodejs-lts | nodejs, python"
@@ -42,6 +42,7 @@ opt/emscripten-llvm/bin/llvm-lib
 opt/emscripten-llvm/bin/llvm-link
 opt/emscripten-llvm/bin/llvm-mca
 opt/emscripten-llvm/bin/llvm-ml
+opt/emscripten-llvm/bin/llvm-ml64
 opt/emscripten-llvm/bin/llvm-pdbutil
 opt/emscripten-llvm/bin/llvm-profgen
 opt/emscripten-llvm/bin/llvm-rc
@@ -54,13 +55,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=1cc84bcc08f723a6ba9d845c3fed1777547f45f9
-_LLVM_TGZ_SHA256=ef47b1de67e897fc838d9610dc803da5d123edb14ffe5dbb691154f2ba9ac40a
+_LLVM_COMMIT=12f392cff10fcc70b4ec4f01ab386922742e9136
+_LLVM_TGZ_SHA256=697b989870bc62a81a52a720a33aac270778199ff0192dfd3458bbb87c290d8d
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=fc1a391b9320602b624cefe5e760eda40cbb05a3
-_BINARYEN_TGZ_SHA256=48e4d73d7a7f3f78c1cb7e25ecaaa892e3b9abbb03a5920198a88c74ecc93c19
+_BINARYEN_COMMIT=f23ae3586619f64811c3f22831a64ae8eb5e6929
+_BINARYEN_TGZ_SHA256=2983e97be93b75dd4cd3ed7be68007710611302f0b2deb03a55d0808cac1a585
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -112,7 +113,7 @@ termux_pkg_auto_update() {
 	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
 
 	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+		termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	fi
 
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then

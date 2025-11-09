@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="10.0p2"
-TERMUX_PKG_REVISION=9
+TERMUX_PKG_VERSION="10.2p1"
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
-TERMUX_PKG_SHA256=a25b32645dc6b474064b9deb07afc9d8e37b127d026a1170b54feb929145140c
+TERMUX_PKG_SHA256=8d3083bca4864cbc760bfcc3e67d86d401e27faa5eaafa1482c2316f5d5186b3
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="termux-services"
@@ -57,7 +56,7 @@ TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 termux_pkg_auto_update() {
 	local latest_tag version
 	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	version="$(sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/' <<< "${latest_tag}")"
 	termux_pkg_upgrade_version "$version"
 }

@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 # Revbump reverse dependencies after updating
 TERMUX_PKG_VERSION="1.3.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.fltk.org/pub/fltk/${TERMUX_PKG_VERSION}/fltk-${TERMUX_PKG_VERSION}-source.tar.gz
 TERMUX_PKG_SHA256=d736b0445c50d607432c03d5ba5e82f3fba2660b10bc1618db8e077a42d9511b
 TERMUX_PKG_AUTO_UPDATE=false
@@ -32,6 +33,6 @@ termux_step_pre_configure() {
 termux_step_post_massage() {
 	local _GUARD_FILE="lib/libfltk.so.1.3"
 	if [ ! -e "${_GUARD_FILE}" ]; then
-		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
 }
