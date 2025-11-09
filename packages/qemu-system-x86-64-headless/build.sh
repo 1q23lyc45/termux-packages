@@ -83,11 +83,10 @@ termux_step_configure() {
 	./configure \
 		--prefix="$TERMUX_PREFIX" \
 		--cross-prefix="${TERMUX_HOST_PLATFORM}-" \
-		--host-cc="gcc" \
+		--host-cc="clang" \
 		--cc="$CC" \
 		--cxx="$CXX" \
 		--objcc="$CC" \
-		-Db_lto=true \
 		-Doptimization=3 \
 		--disable-debug-info \
 		--disable-stack-protector \
