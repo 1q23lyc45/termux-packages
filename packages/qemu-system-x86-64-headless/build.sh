@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:8.2.10
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=37b4a643da8ed6015eef35f5d7f06e7259d9c95359965a0a98e9667c621ab2bb
 TERMUX_PKG_DEPENDS="alsa-lib, dtc, glib, jack2, libbz2, libcurl, libdw, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
@@ -69,9 +70,12 @@ termux_step_configure() {
 	QEMU_TARGETS+="riscv64-linux-user,"
 	QEMU_TARGETS+="x86_64-linux-user"
 
-	CFLAGS+=" $CPPFLAGS"
-	CXXFLAGS+=" $CPPFLAGS"
-	LDFLAGS+=" -landroid-shmem -llog"
+	CFLAGS+=" $CPPFLAGS -O3 -flto"
+	CXXFLAGS+=" $CPPFLAGS -O3 -flto"
+	LDFLAGS+=" -landroid-shmem -llog -O3 -flto"
+	sed -i 's/-O0/-O3/g' ./configure
+	sed -i 's/-O2/-O3/g' ./configure
+	sed -i 's/optimization=2/optimization=3/g' ./meson.build
 
 	# Note: using --disable-stack-protector since stack protector
 	# flags already passed by build scripts but we do not want to
@@ -83,6 +87,9 @@ termux_step_configure() {
 		--cc="$CC" \
 		--cxx="$CXX" \
 		--objcc="$CC" \
+		-Db_lto=true \
+		-Doptimization=3 \
+		--disable-debug-info \
 		--disable-stack-protector \
 		--smbd="$TERMUX_PREFIX/bin/smbd" \
 		--enable-coroutine-pool \
