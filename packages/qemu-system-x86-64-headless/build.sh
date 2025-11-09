@@ -69,9 +69,12 @@ termux_step_configure() {
 	QEMU_TARGETS+="riscv64-linux-user,"
 	QEMU_TARGETS+="x86_64-linux-user"
 
-	CFLAGS+=" $CPPFLAGS"
-	CXXFLAGS+=" $CPPFLAGS"
-	LDFLAGS+=" -landroid-shmem -llog"
+	CFLAGS+=" $CPPFLAGS -O3 -flto"
+	CXXFLAGS+=" $CPPFLAGS -O3 -flto"
+	LDFLAGS+=" -landroid-shmem -llog -O3 -flto"
+	sed -i 's/-O0/-O3/g' ./configure
+	sed -i 's/-O2/-O3/g' ./configure
+	sed -i 's/optimization=2/optimization=3/g' ./meson.build
 
 	# Note: using --disable-stack-protector since stack protector
 	# flags already passed by build scripts but we do not want to
@@ -83,6 +86,9 @@ termux_step_configure() {
 		--cc="$CC" \
 		--cxx="$CXX" \
 		--objcc="$CC" \
+		-Db_lto=true \
+		-Doptimization=3 \
+		--disable-debug-info \
 		--disable-stack-protector \
 		--smbd="$TERMUX_PREFIX/bin/smbd" \
 		--enable-coroutine-pool \
