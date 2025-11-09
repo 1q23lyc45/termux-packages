@@ -70,9 +70,9 @@ termux_step_configure() {
 	QEMU_TARGETS+="riscv64-linux-user,"
 	QEMU_TARGETS+="x86_64-linux-user"
 
-	CFLAGS+=" $CPPFLAGS -O3 -flto"
-	CXXFLAGS+=" $CPPFLAGS -O3 -flto"
-	LDFLAGS+=" -landroid-shmem -llog -O3 -flto"
+	CFLAGS+=" $CPPFLAGS -O3"
+	CXXFLAGS+=" $CPPFLAGS -O3"
+	LDFLAGS+=" -landroid-shmem -llog -O3"
 	sed -i 's/-O0/-O3/g' ./configure
 	sed -i 's/-O2/-O3/g' ./configure
 	sed -i 's/optimization=2/optimization=3/g' ./meson.build
